@@ -1,4 +1,5 @@
 #include "phew.h"
+#include "parser.h"
 
 void send_user_message(char* input)
 {
@@ -10,22 +11,25 @@ void refresh()
 {
 	combine(result, 2, "refresh ", token);
 	send_message(result);
-	cJSON *json = cJSON_Parse(result);
-	cJSON *type = cJSON_GetObjectItemCaseSensitive(json, "type");
+	//cJSON *json = cJSON_Parse(result);
+	//cJSON *type = cJSON_GetObjectItemCaseSensitive(json, "type");
+	JSON* json = jackie__parse_it(result);
+	ITEM* messages = (ITEM*)json->item[1];
 	//if (type->valuestring != "List") return;
-	cJSON *messages = cJSON_GetObjectItemCaseSensitive(json, "content");
-	cJSON *message = NULL;
+	//cJSON *messages = cJSON_GetObjectItemCaseSensitive(json, "content");
+	//cJSON *message = NULL;
 	combine(result, 1, "\n");
 	char tmp[MAX_WINDOW_WIDTH];
-	cJSON_ArrayForEach(message, messages)
+	for (int i = 0; i < messages->a_len; i ++)
 	{
+		JSON* message = ((ITEM*) messages->a_part[i])->j_part;
 		combine(tmp, 4, 
-				cJSON_GetObjectItemCaseSensitive(message, "sender")->valuestring,
+				((ITEM*)message->item[0])->s_part,
 				": ", 
-				cJSON_GetObjectItemCaseSensitive(message, "content")->valuestring,
+				((ITEM*)message->item[1])->s_part,
 			   	"\n");
 		strcat(result, tmp);
-		printf("## %s\n", cJSON_GetObjectItemCaseSensitive(message, "content")->valuestring);
+		//printf("## %s\n", cJSON_GetObjectItemCaseSensitive(message, "content")->valuestring);
 	}
 }
 
@@ -33,17 +37,21 @@ void get_channel_members()
 {
 	combine(result, 2, "channel members ", token);
 	send_message(result);
-	cJSON *json = cJSON_Parse(result);
-	cJSON *type = cJSON_GetObjectItemCaseSensitive(json, "type");
+	printf(result);
+	JSON* json = jackie__parse_it(result);
+	//cJSON *json = cJSON_Parse(result);
+	//cJSON *type = cJSON_GetObjectItemCaseSensitive(json, "type");
 	//if (type->valuestring != "List") return;
-	cJSON *members = cJSON_GetObjectItemCaseSensitive(json, "content");
-	cJSON *member = NULL;
+	//cJSON *members = cJSON_GetObjectItemCaseSensitive(json, "content");
+	//cJSON *member = NULL;
 	combine(result, 1, "\n");
 	char tmp[MAX_WINDOW_WIDTH];
-	cJSON_ArrayForEach(member, members)
+	ITEM* members = (ITEM*) json->item[1];
+	//cJSON_ArrayForEach(member, members)
+	for (int i = 0; i < members->a_len; i ++)
 	{
 		combine(tmp, 2, 
-				member->valuestring,
+				((ITEM*)members->a_part[i])->s_part,
 			   	"\n");
 		strcat(result, tmp);
 	}

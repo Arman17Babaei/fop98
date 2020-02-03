@@ -22,7 +22,7 @@ void make_view()
 		printf("%d: %s\n", index, current_page->options[index]);
 		reset_color();
 	}
-	set_color(1, RESULT_COLOR);
+	set_color(0, RESULT_COLOR);
 	printf("%s\n", result);
 	reset_color();
 }
